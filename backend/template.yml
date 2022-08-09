@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Keeps track of a list of subscribers to updates about the Sweet Petit Feastival
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  FeastivalSubscribers:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: FeastivalSubscribers
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  BasicAWSApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: API Gateway to sit in front of Lambda functions
+      StageName: Prod
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 10
+        ThrottlingRateLimit: 10
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: s3://sweet-petit-feastival/swagger.yml
+
+  RegisterForUpdates:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: package/  # must be built
+      Handler: app.api.handler
+      Runtime: python3.7
+      MemorySize: 128
+    Events:
+      ApiEvent:
+        Type: Api
+        Properties:
+          Method: post
+          Path: /register
+          RestApiId: !Ref BasicAWSApiGateway
+      Policies:
+        DynamoDBWritePolicy:
+          TableName: !Ref FeastivalSubscribers
+        DynamoDBReadPolicy:
+          TableName: !Ref FeastivalSubscribers
+
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for our Register"
+    Value: !Sub "https://${BasicAWSApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/register/"

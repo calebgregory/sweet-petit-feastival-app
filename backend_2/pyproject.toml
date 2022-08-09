@@ -1,0 +1,28 @@
+[tool.mypy]
+python_version = "3.8"
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ['boto3', 'broadcaster']
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+line_length = 105
+
+[tool.black]
+line-length = 105
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.coverage.paths]
+source = ["app"]

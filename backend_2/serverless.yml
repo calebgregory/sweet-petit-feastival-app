@@ -1,0 +1,50 @@
+service: sweet-petit-feastival
+frameworkVersion: '3'
+
+custom:
+  httpApi:
+    cors: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  environment:
+    TABLE_NAME:
+      Ref: FeastivalSubscribersTable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "Fn::GetAtt": [FeastivalSubscribersTable, Arn]
+
+functions:
+  register:
+    handler: app.api.handler
+    events:
+      - httpApi:
+          path: /register
+          method: post
+
+resources:
+  Resources:
+    FeastivalSubscribersTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: FeastivalSubscribersTable
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-python-requirements

@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+boto3 = "==1.20.32"
+cattrs = "*"
+attrs = "*"
+xoto3 = "*"
+
+[dev-packages]
+mypy = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

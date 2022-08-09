@@ -1,6 +1,8 @@
 import React, { FormEvent, useState } from "react"
 import "./App.css"
 
+import config from "./config.json"
+
 const info = [
   `If you haven't been up to Greenbrier before, our house has a big backyard
   with lots of room to play. This event will be kid-friendly and dog-friendly,
@@ -43,7 +45,7 @@ export function App() {
   const [submitted, set_submitted] = useState(false)
   const [error, set_error] = useState("")
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
 
     const e = email.trim().toLowerCase()
@@ -53,7 +55,17 @@ export function App() {
       return
     }
 
-    console.log(e)
+    try {
+      const resp = await (
+        await fetch(`${config.url}/register`, {
+          method: "post",
+          body: JSON.stringify({ email: e })
+        })
+      ).json()
+      console.log("got resp", resp)
+    } catch (error) {
+      console.error("error making that request", error)
+    }
     set_email("")
     set_submitted(true)
   }

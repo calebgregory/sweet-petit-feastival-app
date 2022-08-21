@@ -18,7 +18,7 @@ const info = [
   like?", "Is it possible to make sweet potato ..cheese?", "...sweet potato
   wine?  or mead?", "A sweet potato elixir??", "Sweet potato icecream???"`,
   `Unfortunately, we won't really be able to share our kitchen, so whatever you
-  need to heat it (or reheat it), you'll have responsible for.`,
+  need to heat it (or reheat it), you'll have to be responsible for.`,
   `There will be a democratic process whereby each Feastival-goer will vote on
   their favorite dishes. The person whose dish earns the most votes will get a
   prize.`,

@@ -38,7 +38,7 @@ repos:
     hooks:
       - id: mypy-pipenv
         name: mypy-pipenv
-        entry: pipenv run mypy app
+        entry: cd backend && ./scripts/run-mypy
         language: system
         pass_filenames: false
         types: [python]

@@ -26,7 +26,7 @@ provider:
 
 functions:
   register:
-    handler: app.api.handler
+    handler: app.api.LAM_register
     events:
       - httpApi:
           path: /register

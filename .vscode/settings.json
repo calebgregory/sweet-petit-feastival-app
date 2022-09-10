@@ -15,6 +15,9 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
+  "[python]": {
+    "editor.formatOnSave": true,
+  },
   "[json]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"

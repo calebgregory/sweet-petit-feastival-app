@@ -31,6 +31,12 @@ functions:
       - httpApi:
           path: /register
           method: post
+  listParticipants:
+    handler: app.api.LAM_list_participants
+    events:
+      - httpApi:
+          path: /participants
+          method: get
 
 resources:
   Resources:

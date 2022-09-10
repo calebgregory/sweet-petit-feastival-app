@@ -1,7 +1,9 @@
 import os
+import typing as ty
 
 import boto3
 import xoto3.dynamodb.get as get
+import xoto3.dynamodb.paginate as pag
 import xoto3.dynamodb.put as put
 from xoto3.dynamodb.types import Item, TableResource
 from xoto3.utils.lazy import Lazy
@@ -30,3 +32,11 @@ def get_subscriber(id: str) -> Subscriber:
 
 def create_subscriber(sub: Subscriber) -> Subscriber:
     return struc_sub(dict(put.put_but_raise_if_exists(SubscribersTableRes(), unstruc_sub(sub))))
+
+
+def list_subscribers() -> ty.List[Subscriber]:
+    subscribers = [
+        converter.structure(item, Subscriber)
+        for item in pag.yield_items(SubscribersTableRes().scan, dict())
+    ]
+    return subscribers

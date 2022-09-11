@@ -24,9 +24,8 @@ globals:
   __DEV__: readonly
 
 settings:
-  import/internal-regex: ^@xoeye/
   import/ignore:
-    - react-native
+    - react
   import/no-extraneous-dependencies:
     - error
   import/resolver:
@@ -81,6 +80,18 @@ rules:
         - parent
         - sibling
         - index
+      alphabetize:
+        order: "asc"
+      newlines-between: always
+      pathGroups:
+        - pattern: react
+          group: builtin
+          position: after
+        - pattern: .*/**/*.css
+          group: external
+          position: before
+      pathGroupsExcludedImportTypes:
+        - react
 
   # General Rules
   semi:

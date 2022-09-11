@@ -37,14 +37,7 @@ function _fetch<Input extends Record<string, any>, Result>(
   ).then((resp) => resp.json())
 }
 
-export async function register_for_emails(
-  email: string
-): Promise<RegisterForPotluckResult> {
-  const e = fmt_and_throw_if_email_invalid(email)
-  return await _fetch("/register", { email: e })
-}
-
-export async function register_to_bring_food(
+export async function register(
   input: RegisterForPotluckInput
 ): Promise<RegisterForPotluckResult> {
   input.email = fmt_and_throw_if_email_invalid(input.email)

@@ -1,6 +1,5 @@
 export type Participant = {
-  id: string;
-  email?: string;
+  id: string; // sha256hash.hex of email
   name: string;
   food_to_bring: string;
 }

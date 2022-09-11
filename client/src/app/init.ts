@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { determind_user_id_from_participants } from "../coordinate/determine_user_id_from_participants"
+import { determine_user_id_from_participants } from "../coordinate/determine_user_id_from_participants"
 
 import * as api from "./api"
 import * as core from "./core"
@@ -18,7 +18,7 @@ export async function init() {
   state_tree.participants.value = potluck_participants
 
   if (state_tree.user_email.value) {
-    const user_id = await determind_user_id_from_participants(
+    const user_id = await determine_user_id_from_participants(
       state_tree.user_email.value,
       potluck_participants
     )

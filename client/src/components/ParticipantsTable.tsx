@@ -8,12 +8,70 @@ import { ValidationError } from "../lib/errors"
 
 type Props = {
   user_email: Signal<string>;
+  user_id: Signal<string>;
   participants: Signal<Participant[]>;
   submit: (input: RegisterForPotluckInput) => Promise<unknown>;
 }
 
-export function ParticipantsTable({ user_email, participants, submit }: Props) {
-  const form_enabled = useSignal(false)
+export function EditableParticipantEntry({
+  participant: p,
+  food_to_bring,
+  edit_form_enabled,
+  handle_submit,
+  handle_edit_click
+}: {
+  participant: Participant;
+  food_to_bring: Signal<string>;
+  edit_form_enabled: Signal<boolean>;
+  handle_submit: (e: FormEvent) => Promise<unknown>;
+  handle_edit_click: (p: Participant) => unknown;
+}) {
+  return (
+    <tr>
+      <td className="participant_name">{p.name}</td>
+      <td>
+        {edit_form_enabled.value ? (
+          <input
+            type="text"
+            value={food_to_bring.value}
+            onChange={(e) => {
+              food_to_bring.value = e.target.value
+            }}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") {
+                handle_submit(e)
+              }
+            }}
+          />
+        ) : (
+          <span onClick={handle_edit_click.bind(null, p)}>
+            {p.food_to_bring}
+          </span>
+        )}
+      </td>
+      <td>
+        {edit_form_enabled.value ? (
+          <span className="icon" onClick={handle_submit}>
+            {"✅"}
+          </span>
+        ) : (
+          <span className="icon" onClick={handle_edit_click.bind(null, p)}>
+            {"✏️"}
+          </span>
+        )}
+      </td>
+    </tr>
+  )
+}
+
+export function ParticipantsTable({
+  user_email,
+  user_id,
+  participants,
+  submit
+}: Props) {
+  const create_form_enabled = useSignal(false)
+  const edit_form_enabled = useSignal(false)
   const email = useSignal(user_email.value)
   const email_error = useSignal("")
   const name = useSignal("")
@@ -35,7 +93,7 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
     food_to_bring.value = ""
   }
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handle_submit = async (event: FormEvent) => {
     event.preventDefault()
 
     try {
@@ -52,8 +110,17 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
         console.warn("submit failed due to error", _error)
       }
     }
-    form_enabled.value = false
+    create_form_enabled.value = false
+    edit_form_enabled.value = false
     clear_form()
+  }
+
+  const handle_edit_click = (p: Participant) => {
+    email.value = user_email.value
+    name.value = p.name
+    food_to_bring.value = food_to_bring.value || p.food_to_bring // preserve edits
+
+    edit_form_enabled.value = true
   }
 
   return (
@@ -70,16 +137,31 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
       <div className="participants_table_container">
         <table className="participants_table">
           <tbody>
-            {participants_with_name.value.map((p, i) => (
-              <tr key={p.id + i}>
-                <td className="participant_name">{p.name}</td>
-                <td>{p.food_to_bring}</td>
-              </tr>
-            ))}
+            {participants_with_name.value.map((p, i) => {
+              if (p.id === user_id.value) {
+                return (
+                  <EditableParticipantEntry
+                    key={p.id + i}
+                    edit_form_enabled={edit_form_enabled}
+                    food_to_bring={food_to_bring}
+                    handle_edit_click={handle_edit_click}
+                    handle_submit={handle_submit}
+                    participant={p}
+                  />
+                )
+              }
+
+              return (
+                <tr key={p.id + i}>
+                  <td className="participant_name">{p.name}</td>
+                  <td>{p.food_to_bring}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
-        {form_enabled.value && (
-          <form id="food_to_bring" onSubmit={handleSubmit}>
+        {create_form_enabled.value && (
+          <form id="food_to_bring" onSubmit={handle_submit}>
             <div>
               <input
                 className={classnames(email_error.value && "error")}
@@ -119,39 +201,40 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
             </div>
           </form>
         )}
-        {!form_enabled.value ? (
-          <button
-            className="primary"
-            onClick={() => {
-              form_enabled.value = true
-            }}
-          >
-            add your dish
-          </button>
-        ) : (
-          <div className="button_group">
-            <button
-              onClick={() => {
-                form_enabled.value = false
-                clear_form()
-              }}
-            >
-              nevermind
-            </button>
+        {!user_id.value &&
+          (!create_form_enabled.value ? (
             <button
               className="primary"
-              disabled={!is_valid.value}
-              onClick={handleSubmit}
+              onClick={() => {
+                create_form_enabled.value = true
+              }}
             >
-              ok!
+              add your dish
             </button>
-          </div>
-        )}
+          ) : (
+            <div className="button_group">
+              <button
+                onClick={() => {
+                  create_form_enabled.value = false
+                  clear_form()
+                }}
+              >
+                nevermind
+              </button>
+              <button
+                className="primary"
+                disabled={!is_valid.value}
+                onClick={handle_submit}
+              >
+                ok!
+              </button>
+            </div>
+          ))}
         <p className="extra_info">
           ℹ - (Because of how I built this, if you want to update what
           you&#39;re bringing, you&#39;ll have to do that on the same device you
-          originally used to add your dish. This code is open-source; you can go
-          read it{" "}
+          originally used to add your dish. This invitation&#39;s code is
+          open-source; you can go read it{" "}
           <a
             href="https://github.com/calebgregory/sweet-petit-feastival-app"
             rel="noreferrer"

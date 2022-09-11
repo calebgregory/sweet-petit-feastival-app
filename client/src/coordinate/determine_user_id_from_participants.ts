@@ -15,7 +15,7 @@ const sha256hash = async (str: string): Promise<string> => {
   return hash_hex
 }
 
-export async function determind_user_id_from_participants(
+export async function determine_user_id_from_participants(
   user_email: string,
   participants: Participant[]
 ): Promise<string> {

@@ -4,8 +4,7 @@ import "./App.css"
 import { useCore } from "./app/core-context"
 import { EmailRegistrationForm } from "./components/EmailRegistrationForm"
 import { ParticipantsTable } from "./components/ParticipantsTable"
-import { register_for_emails } from "./coordinate/register_for_emails"
-import { register_to_bring_food } from "./coordinate/register_to_bring_food"
+import { register } from "./coordinate/register"
 
 const what_to_bring = [
   "Your favorite <b>yard games</b>",
@@ -42,7 +41,7 @@ const info = [
 export function App() {
   const core = useCore()
   const {
-    state_tree: { participants, user_email }
+    state_tree: { participants, user_email, user_id }
   } = core
 
   return (
@@ -62,7 +61,7 @@ export function App() {
         </li>
       </ul>
       <EmailRegistrationForm
-        submit={register_for_emails.bind(null, core)}
+        submit={(email) => register(core, { email })}
         user_email={user_email}
       />
       <h4>What to bring</h4>
@@ -73,8 +72,9 @@ export function App() {
       </ul>
       <ParticipantsTable
         participants={participants}
-        submit={register_to_bring_food.bind(null, core)}
+        submit={(input) => register(core, input)}
         user_email={user_email}
+        user_id={user_id}
       />
       <h4>More info </h4>
       {info.map((n, i) => (

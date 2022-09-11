@@ -92,6 +92,14 @@ span#error {
   font-weight: bold;
 }
 
+.icon {
+  font-size: 18px;
+}
+
+.icon.cancel {
+  margin-right: 5px;
+}
+
 .participants_table_container button {
   margin-top: 10px;
   margin-right: 30px;

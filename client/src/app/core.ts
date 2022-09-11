@@ -41,8 +41,7 @@ export type Core = {
   state_tree: StateTree;
   api: {
     list_participants: typeof api.list_participants;
-    register_for_emails: typeof api.register_for_emails;
-    register_to_bring_food: typeof api.register_to_bring_food;
+    register: typeof api.register;
   };
 }
 

@@ -7,10 +7,10 @@ from .serde import converter
 from .store import list_subscribers
 from .types import (
     ListPotluckParticipantsResult,
+    Participant,
     RegisterForPotluckInput,
     RegisterForPotluckResult,
     Subscriber,
-    SubscriberApiView,
 )
 
 T = ty.TypeVar("T")
@@ -24,12 +24,12 @@ def _successful_result(resp: T):
     }
 
 
-def _xf_subscriber_to_api_view(sub: Subscriber) -> SubscriberApiView:
+def _xf_subscriber_to_api_view(sub: Subscriber) -> Participant:
     id = hashlib.sha256(sub.email.encode()).hexdigest()
-    return SubscriberApiView(id=id, name=sub.name, food_to_bring=sub.food_to_bring)
+    return Participant(id=id, name=sub.name, food_to_bring=sub.food_to_bring)
 
 
-def _xf_subscribers_to_api_view(subscribers: ty.List[Subscriber]) -> ty.List[SubscriberApiView]:
+def _xf_subscribers_to_api_view(subscribers: ty.List[Subscriber]) -> ty.List[Participant]:
     return [_xf_subscriber_to_api_view(sub) for sub in subscribers]
 
 

@@ -14,7 +14,7 @@ class Subscriber:
 
 
 @define
-class SubscriberApiView:
+class Participant:
     id: str
     name: str = ""
     food_to_bring: str = ""
@@ -29,9 +29,9 @@ class RegisterForPotluckInput:
 
 @define
 class RegisterForPotluckResult:
-    potluck_participants: ty.List[SubscriberApiView] = Factory(list)
+    potluck_participants: ty.List[Participant] = Factory(list)
 
 
 @define
 class ListPotluckParticipantsResult:
-    potluck_participants: ty.List[SubscriberApiView] = Factory(list)
+    potluck_participants: ty.List[Participant] = Factory(list)

@@ -1,7 +1,13 @@
-import React, { FormEvent, useState } from "react"
+import React from "react"
 import "./App.css"
+import { EmailRegistrationForm } from "./components/EmailRegistrationForm"
+import { registerForEmails } from "./api"
 
-import config from "./config.json"
+const what_to_bring = [
+  "Your favorite <b>yard games</b>",
+  "Your own <b>plate, cup, and silverware</b> (optional; we'll have some paper plates just in case)",
+  "A <b>dish</b> (or two (or three)) presenting our fabled sweet potato in a form of your choosing!"
+]
 
 const info = [
   `If you haven't been up to Greenbrier before, our house has a big backyard
@@ -30,46 +36,7 @@ const info = [
   `-- Caleb and Brittany`
 ]
 
-const email_re = /^\S+@\S+\.\S+$/i
-
-function _is_email_valid(email: string): boolean {
-  return email_re.test(email)
-}
-
-function classnames(...ns: (string | boolean | null | undefined)[]): string {
-  return ns.filter(Boolean).join(" ")
-}
-
 export function App() {
-  const [email, set_email] = useState("")
-  const [submitted, set_submitted] = useState(false)
-  const [error, set_error] = useState("")
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    const e = email.trim().toLowerCase()
-
-    if (e && !_is_email_valid(email)) {
-      set_error("invalid email")
-      return
-    }
-
-    try {
-      const resp = await (
-        await fetch(`${config.url}/register`, {
-          method: "post",
-          body: JSON.stringify({ email: e })
-        })
-      ).json()
-      console.log("got resp", resp)
-    } catch (error) {
-      console.error("error making that request", error)
-    }
-    set_email("")
-    set_submitted(true)
-  }
-
   return (
     <div className="app">
       <h1>🍠!</h1>
@@ -86,49 +53,16 @@ export function App() {
           <a href="https://goo.gl/maps/MDkjhkybCdEZb11G9">map</a>)
         </li>
       </ul>
-      <p>
-        Please enter your email in this form so that we can send you updates as
-        we think of them. We promise not to spam you, and of course you&#39;ll
-        be <code>bcc:</code>&#39;d :)
-      </p>
-      <form onSubmit={handleSubmit}>
-        <input
-          className={classnames(error && "error")}
-          disabled={submitted}
-          placeholder={submitted ? "thank you!" : "please gimme your email"}
-          type="text"
-          value={email}
-          onChange={(event) => {
-            if (error) {
-              set_error("")
-            }
-            set_email(event.target.value)
-          }}
-        />
-        <button disabled={submitted}>
-          {submitted ? "🎉" : "here you go!"}
-        </button>
-      </form>
-      {error && <span id="error">{error}</span>}
+      <EmailRegistrationForm submit={registerForEmails} />
       <h4>What to bring</h4>
-      <p>
-        <ul>
-          <li>
-            Your favorite <b>yard games</b>
-          </li>
-          <li>
-            Your own <b>plate, cup, and silverware</b> (optional; we&#39;ll have
-            some paper plates just in case)
-          </li>
-          <li>
-            A <b>dish</b> (or two (or three)) presenting our fabled sweet potato
-            in a form of your choosing!
-          </li>
-        </ul>
-      </p>
+      <ul>
+        {what_to_bring.map((wtb, i) => (
+          <li key={i} dangerouslySetInnerHTML={{ __html: wtb }}></li>
+        ))}
+      </ul>
       <h4>More info </h4>
       {info.map((n, i) => (
-        <p dangerouslySetInnerHTML={{ __html: n }} key={i}></p>
+        <p key={i} dangerouslySetInnerHTML={{ __html: n }}></p>
       ))}
     </div>
   )

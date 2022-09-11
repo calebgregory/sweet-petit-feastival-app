@@ -36,7 +36,7 @@ export function EmailRegistrationForm({ submit }: Props) {
         we think of them. We promise not to spam you, and of course you&#39;ll
         be <code>bcc:</code>&#39;d :)
       </p>
-      <form onSubmit={handleSubmit}>
+      <form id="email_registration" onSubmit={handleSubmit}>
         <input
           className={classnames(error && "error")}
           disabled={submitted}
@@ -50,7 +50,7 @@ export function EmailRegistrationForm({ submit }: Props) {
             set_email(event.target.value)
           }}
         />
-        <button disabled={submitted}>
+        <button className="primary" disabled={submitted}>
           {submitted ? "🎉" : "here you go!"}
         </button>
       </form>

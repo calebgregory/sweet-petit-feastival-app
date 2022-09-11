@@ -1,7 +1,11 @@
 import React from "react"
+
 import "./App.css"
+import { useCore } from "./app/core-context"
 import { EmailRegistrationForm } from "./components/EmailRegistrationForm"
-import { registerForEmails } from "./api"
+import { ParticipantsTable } from "./components/ParticipantsTable"
+import { register_for_emails } from "./coordinate/register_for_emails"
+import { register_to_bring_food } from "./coordinate/register_to_bring_food"
 
 const what_to_bring = [
   "Your favorite <b>yard games</b>",
@@ -24,19 +28,23 @@ const info = [
   like?", "Is it possible to make sweet potato ..cheese?", "...sweet potato
   wine?  or mead?", "A sweet potato elixir??", "Sweet potato icecream???"`,
   `Unfortunately, we won't really be able to share our kitchen, so whatever you
-  need to heat it (or reheat it), you'll have to be responsible for.`,
+  need to heat it (or reheat it), you'll have to be responsible for. <i>Update: If that
+  makes things complicated or difficult because you're traveling, hit us up,
+  because we'll make exceptions.</i>`,
   `There will be a democratic process whereby each Feastival-goer will vote on
   their favorite dishes. The person whose dish earns the most votes will get a
   prize.`,
-  `At some point, I may create a web form that everyone can use to tell everyone
-  else what they're planning on bringing. If I do that, I'll send out an email.`,
-  `Well, that's it for now. Email or message me with questions
-  (<code>calebgregory@gmail.com</code>), and be on the lookout for updates in
-  the next 2 months. Looking forward to maybe seeing ya!`,
+  `Well, that's it. Email or message me with questions
+  (<code>calebgregory@gmail.com</code>). Looking forward to seeing ya!`,
   `-- Caleb and Brittany`
 ]
 
 export function App() {
+  const core = useCore()
+  const {
+    state_tree: { participants, user_email }
+  } = core
+
   return (
     <div className="app">
       <h1>🍠!</h1>
@@ -53,13 +61,18 @@ export function App() {
           <a href="https://goo.gl/maps/MDkjhkybCdEZb11G9">map</a>)
         </li>
       </ul>
-      <EmailRegistrationForm submit={registerForEmails} />
+      <EmailRegistrationForm submit={register_for_emails.bind(null, core)} />
       <h4>What to bring</h4>
       <ul>
         {what_to_bring.map((wtb, i) => (
           <li key={i} dangerouslySetInnerHTML={{ __html: wtb }}></li>
         ))}
       </ul>
+      <ParticipantsTable
+        participants={participants}
+        submit={register_to_bring_food.bind(null, core)}
+        user_email={user_email}
+      />
       <h4>More info </h4>
       {info.map((n, i) => (
         <p key={i} dangerouslySetInnerHTML={{ __html: n }}></p>

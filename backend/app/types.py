@@ -5,21 +5,10 @@ from attrs import Factory, define
 
 
 @define
-class RegisterForPotluckInput:
-    email: str
-    name: str
-    food_to_bring: str = ""
-
-
-@define
-class RegisterForPotluckResult:
-    ok: bool
-
-
-@define
 class Subscriber:
     email: str
     created_at: datetime
+    updated_at: ty.Optional[datetime] = None
     name: str = ""
     food_to_bring: str = ""
 
@@ -29,6 +18,18 @@ class SubscriberApiView:
     id: str
     name: str = ""
     food_to_bring: str = ""
+
+
+@define
+class RegisterForPotluckInput:
+    email: str
+    name: str = ""
+    food_to_bring: str = ""
+
+
+@define
+class RegisterForPotluckResult:
+    potluck_participants: ty.List[SubscriberApiView] = Factory(list)
 
 
 @define

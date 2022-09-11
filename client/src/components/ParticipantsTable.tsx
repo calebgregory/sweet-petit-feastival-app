@@ -3,6 +3,7 @@ import React, { FormEvent } from "react"
 import { Signal, useComputed, useSignal } from "@preact/signals-react"
 
 import { Participant, RegisterForPotluckInput } from "../app/types"
+import { classnames } from "../lib/classnames"
 import { ValidationError } from "../lib/errors"
 
 type Props = {
@@ -14,9 +15,10 @@ type Props = {
 export function ParticipantsTable({ user_email, participants, submit }: Props) {
   const form_enabled = useSignal(false)
   const email = useSignal(user_email.value)
-  const error = useSignal("")
+  const email_error = useSignal("")
   const name = useSignal("")
   const food_to_bring = useSignal("")
+  const food_to_bring_error = useSignal("")
 
   const participants_with_name = useComputed(() =>
     participants.value.filter((p) => Boolean(p.name))
@@ -24,6 +26,14 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
   const is_valid = useComputed(
     () => email.value && name.value && food_to_bring.value
   )
+  const is_food_to_bring_valid = useComputed(
+    () => food_to_bring.value.length < 2000
+  )
+
+  const clear_form = () => {
+    name.value = ""
+    food_to_bring.value = ""
+  }
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -36,13 +46,14 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
       })
     } catch (_error) {
       if (_error instanceof ValidationError) {
-        error.value = _error.message
+        email_error.value = _error.message
         return
       } else {
         console.warn("submit failed due to error", _error)
       }
     }
     form_enabled.value = false
+    clear_form()
   }
 
   return (
@@ -53,6 +64,8 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
         to the Feastival. Afterwards, we&#39;re going to compile everyone&#39;s
         recipes into a little <i>Sweet Petit v1 Cookbook Zine</i>, so please
         also bring (or email) your recipe to us so we can include it in that!
+        Note that you can bring multiple things -- just lump them all in the
+        same entry.
       </p>
       <div className="participants_table_container">
         <table className="participants_table">
@@ -69,17 +82,18 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
           <form id="food_to_bring" onSubmit={handleSubmit}>
             <div>
               <input
+                className={classnames(email_error.value && "error")}
                 placeholder="your email (this is how i&#39;ll identify you so please get this right 😛)"
                 type="text"
                 value={email.value}
                 onChange={(e) => {
-                  if (error.value) {
-                    error.value = ""
+                  if (email_error.value) {
+                    email_error.value = ""
                   }
                   email.value = e.target.value
                 }}
               />
-              {error && <span id="error">{error.value}</span>}
+              {email_error && <span id="error">{email_error.value}</span>}
             </div>
             <div>
               <input
@@ -93,6 +107,8 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
             </div>
             <div>
               <input
+                className={classnames(food_to_bring_error.value && "error")}
+                disabled={!is_food_to_bring_valid.value}
                 placeholder="what you're bringing"
                 type="text"
                 value={food_to_bring.value}
@@ -117,6 +133,7 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
             <button
               onClick={() => {
                 form_enabled.value = false
+                clear_form()
               }}
             >
               nevermind
@@ -137,7 +154,8 @@ export function ParticipantsTable({ user_email, participants, submit }: Props) {
           read it{" "}
           <a
             href="https://github.com/calebgregory/sweet-petit-feastival-app"
-            rel="noreferrer" target="_blank"
+            rel="noreferrer"
+            target="_blank"
           >
             here
           </a>

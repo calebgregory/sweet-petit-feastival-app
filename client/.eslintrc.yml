@@ -112,7 +112,6 @@ rules:
     - all
   implicit-arrow-linebreak: off
 
-  # for post defining style object in react-native
   no-use-before-define: off
   '@typescript-eslint/semi':
     - error

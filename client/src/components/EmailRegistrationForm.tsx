@@ -1,32 +1,35 @@
 /* eslint-disable no-console */
-import React, { FormEvent, useState } from "react"
+import React, { FormEvent } from "react"
+
+import { Signal, useComputed, useSignal } from "@preact/signals-react"
 
 import { classnames } from "../lib/classnames"
 import { ValidationError } from "../lib/errors"
 
 type Props = {
+  user_email: Signal<string>;
   submit: (email: string) => Promise<unknown>;
 }
 
-export function EmailRegistrationForm({ submit }: Props) {
-  const [email, set_email] = useState("")
-  const [submitted, set_submitted] = useState(false)
-  const [error, set_error] = useState("")
+export function EmailRegistrationForm({ user_email, submit }: Props) {
+  const email = useSignal("")
+  const error = useSignal("")
+
+  const submitted = useComputed(() => Boolean(user_email))
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     try {
-      await submit(email)
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        set_error(error.message)
+      await submit(email.value)
+    } catch (_error) {
+      if (_error instanceof ValidationError) {
+        error.value = _error.message
         return
       } else {
-        console.warn("submit failed due to error", error)
+        console.warn("submit failed due to error", _error)
       }
     }
-    set_email("")
-    set_submitted(true)
+    email.value = ""
   }
 
   return (
@@ -39,22 +42,24 @@ export function EmailRegistrationForm({ submit }: Props) {
       <form id="email_registration" onSubmit={handleSubmit}>
         <input
           className={classnames(error && "error")}
-          disabled={submitted}
-          placeholder={submitted ? "thank you!" : "please gimme your email"}
+          disabled={submitted.value}
+          placeholder={
+            submitted.value ? "thank you!" : "please gimme your email"
+          }
           type="text"
-          value={email}
+          value={email.value}
           onChange={(event) => {
             if (error) {
-              set_error("")
+              error.value = ""
             }
-            set_email(event.target.value)
+            email.value = event.target.value
           }}
         />
-        <button className="primary" disabled={submitted}>
+        <button className="primary" disabled={submitted.value}>
           {submitted ? "🎉" : "here you go!"}
         </button>
       </form>
-      {error && <span id="error">{error}</span>}
+      {error && <span id="error">{error.value}</span>}
     </>
   )
 }

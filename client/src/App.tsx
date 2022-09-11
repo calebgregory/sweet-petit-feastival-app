@@ -61,7 +61,10 @@ export function App() {
           <a href="https://goo.gl/maps/MDkjhkybCdEZb11G9">map</a>)
         </li>
       </ul>
-      <EmailRegistrationForm submit={register_for_emails.bind(null, core)} />
+      <EmailRegistrationForm
+        submit={register_for_emails.bind(null, core)}
+        user_email={user_email}
+      />
       <h4>What to bring</h4>
       <ul>
         {what_to_bring.map((wtb, i) => (

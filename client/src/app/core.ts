@@ -9,13 +9,15 @@ import { Participant } from "./types"
 export type StateTree = {
   participants: Signal<Participant[]>;
   user_email: Signal<string>;
+  user_id: Signal<string>;
 }
 type StateTreeValues = { [K in keyof StateTree]: StateTree[K]["value"] }
 type InitialState = Partial<StateTreeValues>
 
 export const make_defaults = (): StateTreeValues => ({
   participants: [],
-  user_email: ""
+  user_email: "",
+  user_id: ""
 })
 
 export const make_state_tree = (
@@ -25,10 +27,12 @@ export const make_state_tree = (
 
   const participants = signal(values.participants)
   const user_email = signal(values.user_email)
+  const user_id = signal(values.user_id)
 
   return {
     participants,
-    user_email
+    user_email,
+    user_id
   }
 }
 

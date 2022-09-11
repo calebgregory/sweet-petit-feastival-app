@@ -19,11 +19,18 @@ export function load_from_storage(): Loaded {
   const loaded = make_defaults()
 
   for (const [k, parse] of Object.entries(persist_key_onto_parser)) {
-    const _k = k as keyof typeof persist_key_onto_parser // i wish Object.entries worked better
+    const _k = k as keyof typeof persist_key_onto_parser
     const stored = localStorage.getItem(key(_k))
     if (stored) {
       const value = parse(stored)
       loaded[_k] = value
+    }
+  }
+
+  for (const k of Object.keys(loaded)) {
+    const _k = k as keyof ReturnType<typeof make_defaults>
+    if (!(_k in persist_key_onto_parser)) {
+      delete loaded[_k]
     }
   }
 

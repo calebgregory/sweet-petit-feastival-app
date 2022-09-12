@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import React, { FormEvent } from "react"
 
-import { Signal, useComputed, useSignal } from "@preact/signals-react"
+import { Signal } from "@preact/signals-core"
 
 import { classnames } from "../lib/classnames"
 import { ValidationError } from "../lib/errors"
+import { useSignal, useComputed } from "../lib/signals"
 
 type Props = {
   user_email: Signal<string>;
@@ -15,7 +16,7 @@ export function EmailRegistrationForm({ user_email, submit }: Props) {
   const email = useSignal("")
   const error = useSignal("")
 
-  const submitted = useComputed(() => Boolean(user_email))
+  const submitted = useComputed(() => Boolean(user_email.value))
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -56,7 +57,7 @@ export function EmailRegistrationForm({ user_email, submit }: Props) {
           }}
         />
         <button className="primary" disabled={submitted.value}>
-          {submitted ? "🎉" : "here you go!"}
+          {submitted.value ? "🎉" : "here you go!"}
         </button>
       </form>
       {error && <span id="error">{error.value}</span>}

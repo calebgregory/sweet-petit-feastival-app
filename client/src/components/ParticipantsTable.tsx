@@ -1,10 +1,11 @@
 import React, { FormEvent } from "react"
 
-import { Signal, useComputed, useSignal } from "@preact/signals-react"
+import { Signal } from "@preact/signals-core"
 
 import { Participant, RegisterForPotluckInput } from "../app/types"
 import { classnames } from "../lib/classnames"
 import { ValidationError } from "../lib/errors"
+import { useComputed, useSignal } from "../lib/signals"
 
 type Props = {
   user_email: Signal<string>;
@@ -81,8 +82,8 @@ export function ParticipantsTable({
   const participants_with_name = useComputed(() =>
     participants.value.filter((p) => Boolean(p.name))
   )
-  const is_valid = useComputed(
-    () => email.value && name.value && food_to_bring.value
+  const is_valid = useComputed(() =>
+    Boolean(email.value && name.value && food_to_bring.value)
   )
   const is_food_to_bring_valid = useComputed(
     () => food_to_bring.value.length < 2000
@@ -201,7 +202,7 @@ export function ParticipantsTable({
             </div>
           </form>
         )}
-        {!user_id.value &&
+        {!participants_with_name.value.some((p) => p.id === user_id.value) &&
           (!create_form_enabled.value ? (
             <button
               className="primary"
@@ -233,8 +234,9 @@ export function ParticipantsTable({
         <p className="extra_info">
           ℹ - (Because of how I built this, if you want to update what
           you&#39;re bringing, you&#39;ll have to do that on the same device you
-          originally used to add your dish. This invitation&#39;s code is
-          open-source; you can go read it{" "}
+          originally used to add your dish. Although... I guess you can
+          overwrite an existing entry using the same email. This
+          invitation&#39;s code is open-source; you can go read it{" "}
           <a
             href="https://github.com/calebgregory/sweet-petit-feastival-app"
             rel="noreferrer"

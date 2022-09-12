@@ -1,4 +1,4 @@
-import { effect } from "@preact/signals-react"
+import { effect } from "@preact/signals-core"
 
 import { StateTree, make_defaults } from "./core"
 

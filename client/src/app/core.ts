@@ -1,4 +1,4 @@
-import { Signal, signal } from "@preact/signals-react"
+import { Signal, signal } from "@preact/signals-core"
 
 import { CoreIsNotInitedError } from "../lib/errors"
 

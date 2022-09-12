@@ -88,6 +88,9 @@ export function ParticipantsTable({
   const is_food_to_bring_valid = useComputed(
     () => food_to_bring.value.length < 2000
   )
+  const has_participant_already_submitted = useComputed(() =>
+    participants_with_name.value.some((p) => p.id === user_id.value)
+  )
 
   const clear_form = () => {
     name.value = ""
@@ -200,28 +203,7 @@ export function ParticipantsTable({
                 }}
               />
             </div>
-          </form>
-        )}
-        {!participants_with_name.value.some((p) => p.id === user_id.value) &&
-          (!create_form_enabled.value ? (
-            <button
-              className="primary"
-              onClick={() => {
-                create_form_enabled.value = true
-              }}
-            >
-              add your dish
-            </button>
-          ) : (
-            <div className="button_group">
-              <button
-                onClick={() => {
-                  create_form_enabled.value = false
-                  clear_form()
-                }}
-              >
-                nevermind
-              </button>
+            <div className="button_container">
               <button
                 className="primary"
                 disabled={!is_valid.value}
@@ -230,7 +212,21 @@ export function ParticipantsTable({
                 ok!
               </button>
             </div>
-          ))}
+          </form>
+        )}
+        {!has_participant_already_submitted.value &&
+          !create_form_enabled.value && (
+            <div className="button_container">
+              <button
+                className="primary"
+                onClick={() => {
+                  create_form_enabled.value = true
+                }}
+              >
+                add your dish
+              </button>
+            </div>
+          )}
         <p className="extra_info">
           ℹ - (Because of how I built this, if you want to update what
           you&#39;re bringing, you&#39;ll have to do that on the same device you

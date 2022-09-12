@@ -107,9 +107,9 @@ span#error {
   min-width: 50px;
 }
 
-.participants_table_container .button_group {
+.participants_table_container .button_container {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  justify-content: center;
+  justify-content: right;
 }

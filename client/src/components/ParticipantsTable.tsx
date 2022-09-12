@@ -30,38 +30,117 @@ export function EditableParticipantEntry({
   return (
     <tr>
       <td className="participant_name">{p.name}</td>
-      <td>
-        {edit_form_enabled.value ? (
-          <input
-            type="text"
-            value={food_to_bring.value}
-            onChange={(e) => {
-              food_to_bring.value = e.target.value
-            }}
-            onKeyUp={(e) => {
-              if (e.key === "Enter") {
-                handle_submit(e)
-              }
-            }}
-          />
-        ) : (
-          <span onClick={handle_edit_click.bind(null, p)}>
-            {p.food_to_bring}
-          </span>
-        )}
-      </td>
-      <td>
-        {edit_form_enabled.value ? (
-          <span className="icon" onClick={handle_submit}>
-            {"✅"}
-          </span>
-        ) : (
-          <span className="icon" onClick={handle_edit_click.bind(null, p)}>
-            {"✏️"}
-          </span>
-        )}
-      </td>
+      {edit_form_enabled.value ? (
+        <>
+          <td>
+            <input
+              type="text"
+              value={food_to_bring.value}
+              onChange={(e) => {
+                food_to_bring.value = e.target.value
+              }}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  handle_submit(e)
+                }
+              }}
+            />
+          </td>
+          <td>
+            <span className="icon" onClick={handle_submit}>
+              {"✅"}
+            </span>
+          </td>
+        </>
+      ) : (
+        <>
+          <td>
+            <span onClick={handle_edit_click.bind(null, p)}>
+              {p.food_to_bring}
+            </span>
+          </td>
+          <td>
+            <span className="icon" onClick={handle_edit_click.bind(null, p)}>
+              {"✏️"}
+            </span>
+          </td>
+        </>
+      )}
     </tr>
+  )
+}
+
+function CreateFoodToBringForm({
+  email,
+  email_error,
+  name,
+  food_to_bring,
+  food_to_bring_error,
+  handle_submit
+}: {
+  email: Signal<string>;
+  email_error: Signal<string>;
+  name: Signal<string>;
+  food_to_bring: Signal<string>;
+  food_to_bring_error: Signal<string>;
+  handle_submit: (e: FormEvent) => Promise<unknown>;
+}) {
+  const is_valid = useComputed(() =>
+    Boolean(email.value && name.value && food_to_bring.value)
+  )
+  const is_food_to_bring_valid = useComputed(
+    () => food_to_bring.value.length < 2000
+  )
+
+  return (
+    <form id="food_to_bring" onSubmit={handle_submit}>
+      <div>
+        <input
+          className={classnames(email_error.value && "error")}
+          placeholder="your email (this is how i&#39;ll identify you so please get this right 😛)"
+          type="text"
+          value={email.value}
+          onChange={(e) => {
+            if (email_error.value) {
+              email_error.value = ""
+            }
+            email.value = e.target.value
+          }}
+        />
+        {email_error && <span id="error">{email_error.value}</span>}
+      </div>
+      <div>
+        <input
+          placeholder="your name"
+          type="text"
+          value={name.value}
+          onChange={(e) => {
+            name.value = e.target.value
+          }}
+        />
+      </div>
+      <div>
+        <input
+          className={classnames(food_to_bring_error.value && "error")}
+          disabled={!is_food_to_bring_valid.value}
+          placeholder="what you're bringing"
+          type="text"
+          value={food_to_bring.value}
+          onChange={(e) => {
+            food_to_bring.value = e.target.value
+          }}
+        />
+      </div>
+      <div className="button_container">
+        <button
+          className="primary"
+          disabled={!is_valid.value}
+          onClick={handle_submit}
+        >
+          ok!
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -81,12 +160,6 @@ export function ParticipantsTable({
 
   const participants_with_name = useComputed(() =>
     participants.value.filter((p) => Boolean(p.name))
-  )
-  const is_valid = useComputed(() =>
-    Boolean(email.value && name.value && food_to_bring.value)
-  )
-  const is_food_to_bring_valid = useComputed(
-    () => food_to_bring.value.length < 2000
   )
   const has_participant_already_submitted = useComputed(() =>
     participants_with_name.value.some((p) => p.id === user_id.value)
@@ -165,54 +238,14 @@ export function ParticipantsTable({
           </tbody>
         </table>
         {create_form_enabled.value && (
-          <form id="food_to_bring" onSubmit={handle_submit}>
-            <div>
-              <input
-                className={classnames(email_error.value && "error")}
-                placeholder="your email (this is how i&#39;ll identify you so please get this right 😛)"
-                type="text"
-                value={email.value}
-                onChange={(e) => {
-                  if (email_error.value) {
-                    email_error.value = ""
-                  }
-                  email.value = e.target.value
-                }}
-              />
-              {email_error && <span id="error">{email_error.value}</span>}
-            </div>
-            <div>
-              <input
-                placeholder="your name"
-                type="text"
-                value={name.value}
-                onChange={(e) => {
-                  name.value = e.target.value
-                }}
-              />
-            </div>
-            <div>
-              <input
-                className={classnames(food_to_bring_error.value && "error")}
-                disabled={!is_food_to_bring_valid.value}
-                placeholder="what you're bringing"
-                type="text"
-                value={food_to_bring.value}
-                onChange={(e) => {
-                  food_to_bring.value = e.target.value
-                }}
-              />
-            </div>
-            <div className="button_container">
-              <button
-                className="primary"
-                disabled={!is_valid.value}
-                onClick={handle_submit}
-              >
-                ok!
-              </button>
-            </div>
-          </form>
+          <CreateFoodToBringForm
+            email={email}
+            email_error={email_error}
+            food_to_bring={food_to_bring}
+            food_to_bring_error={food_to_bring_error}
+            handle_submit={handle_submit}
+            name={name}
+          />
         )}
         {!has_participant_already_submitted.value &&
           !create_form_enabled.value && (
